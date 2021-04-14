@@ -1,10 +1,24 @@
+'''
+Attributions:
+
+Title: Riot Games API
+Author: Riot Games
+Source: https://developer.riotgames.com/terms
+License: Riot Games Community License
+
+Title: What Is My MMR?
+Author: Josh (https://www.patreon.com/whatismymmr)
+Source: https://dev.whatismymmr.com/
+License: Creative Commons Attribution 2.0 Generic (CC BY 2.0)
+'''
+
 # Imports
 from riotwatcher import LolWatcher, ApiError
 from enum import Enum
 from typing import Union
+import utils
 
 # Global Variables
-api_key = 'RGAPI-59416af7-32a2-4803-9894-736c42cd3e93'
 
 #try:
 #    watcher = LolWatcher(api_key)
@@ -154,14 +168,14 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
     my_region = region
 
     try:
-        me = watcher.summoner.by_name(my_region, name)
-        print(me)
+        summoner_by_name = watcher.summoner.by_name(my_region, name)
+        summoner_ranked_data = watcher.league.by_summoner(my_region, summoner_by_name['id'])
 
-        my_ranked_stats = watcher.league.by_summoner(my_region, me['id'])
-        print(my_ranked_stats)
+        if (len(summoner_ranked_data) == 0):
+            # create unranked player
+            pass
 
-        summoner_data = my_ranked_stats
-        print(get_highest_rank(my_ranked_stats))
+        highest_rank_data = get_highest_rank(summoner_ranked_data)
 
     except ApiError as err:
         print("Encountered an error fetching user data.")
@@ -169,6 +183,8 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
     return None
 
 def main():
+    api_key = utils.read_key()
+    print(api_key)
     create_summoner('Doublelift', 'na1', api_key)
     create_summoner('bean217', 'na1', api_key)
     create_summoner('Willie', 'na1', api_key)
