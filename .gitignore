@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Custom Files
-*.ignore
+api_key.ignore
