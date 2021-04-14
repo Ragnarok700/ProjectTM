@@ -17,6 +17,7 @@ from riotwatcher import LolWatcher, ApiError
 from enum import Enum
 from typing import Union
 import utils
+import requests
 
 # Global Variables
 
@@ -37,9 +38,18 @@ import utils
 ##### CONSTANTS #####
 
 # Summoner LolWatcher API keys
+LP_KEY = "leaguePoints"
+ICON_ID_KEY = "profileIconId"
+LEVEL_KEY = "summonerLevel"
 SUMMONER_NAME_KEY = "summonerName"
 TIER_KEY = "tier"
 DIVISION_KEY = "rank"
+
+# Summoner WhatIsMyMMR API keys
+MMR_RANKED_KEY = "ranked"
+MMR_NORMAL_KEY = "normal"
+MMR_ARAM_KEY = "ARAM"
+MMR_AVG_KEY = "avg"
 
 ##### Gathering Summoner Data #####
 
@@ -56,18 +66,21 @@ class Tier(Enum):
     GRANDMASTER = 8
     CHALLENGER = 9
 
+# List of Possible Summoner Tier Divisions (from lowest to highest ranked)
 class Division(Enum):
-    IV = 0
-    III = 1
-    II = 2
-    I = 3
+    UNRANKED = 0
+    IV = 1
+    III = 2
+    II = 3
+    I = 4
 
 # Encapsulates Summoner data and provides getters for fetching summoner info
 class Summoner:
-    __slots__ = ["__name", "__level","__tier", "__division", "__MMR_ranked", "__MMR_normal", "__MMR_ARAM", "__LP"]
+    __slots__ = ["__name", "__icon_id", "__level","__tier", "__division", "__MMR_ranked", "__MMR_normal", "__MMR_ARAM", "__LP"]
 
-    def __init__(self, __name: str, __level: int, __tier: Tier, __division: Division, __LP: int, __MMR_ranked: int, __MMR_normal: int, __MMR_ARAM: int ):
+    def __init__(self, __name: str, __icon_id: int, __level: int, __tier: Tier, __division: Division,__MMR_ranked: int, __MMR_normal: int, __MMR_ARAM: int, __LP: int):
         self.__name = __name
+        self.__icon_id = __icon_id
         self.__level = __level
         self.__tier = __tier
         self.__division = __division
@@ -75,6 +88,17 @@ class Summoner:
         self.__MMR_normal = __MMR_normal
         self.__MMR_ARAM = __MMR_ARAM
         self.__LP = __LP
+
+    def __str__(self):
+        return f'Summoner: {self.__name}\n\t' + \
+            f'icon_id: {self.__icon_id}\n\t' + \
+            f'level: {self.__level}\n\t' + \
+            f'tier: {self.__tier}\n\t' + \
+            f'division: {self.__division}\n\t' + \
+            f'mmr_ranked: {self.__MMR_ranked}\n\t' + \
+            f'mmr_normal: {self.__MMR_normal}\n\t' + \
+            f'mmr_ARAM: {self.__MMR_ARAM}\n\t' + \
+            f'LP: {self.__LP}'
 
     def getName(self) -> str:
         return self.__name
@@ -169,14 +193,34 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
 
     try:
         summoner_by_name = watcher.summoner.by_name(my_region, name)
+        level = int(summoner_by_name[LEVEL_KEY])
+        icon_id = int(summoner_by_name[ICON_ID_KEY])
         summoner_ranked_data = watcher.league.by_summoner(my_region, summoner_by_name['id'])
+        # get MMR data:
+        request = requests.get(f'https://na.whatismymmr.com/api/v1/summoner?name={name}')
+        MMR_dict = request.json()
+        mmr_ranked = MMR_dict[MMR_RANKED_KEY][MMR_AVG_KEY]
+        mmr_normal = MMR_dict[MMR_NORMAL_KEY][MMR_AVG_KEY]
+        mmr_aram = MMR_dict[MMR_ARAM_KEY][MMR_AVG_KEY]
+
+        if (mmr_ranked == None):
+            mmr_ranked = -1
+
+        if (mmr_normal == None):
+            mmr_normal = -1
+
+        if (mmr_aram == None):
+            mmr_aram = -1
 
         if (len(summoner_ranked_data) == 0):
-            # create unranked player
-            pass
+            return Summoner(name, icon_id, level, Tier.UNRANKED, Division.UNRANKED, mmr_ranked, mmr_normal, mmr_aram, 0)
 
         highest_rank_data = get_highest_rank(summoner_ranked_data)
 
+        tier, division = get_rank_tuple(highest_rank_data[TIER_KEY], highest_rank_data[DIVISION_KEY])
+        LP = int(highest_rank_data[LP_KEY])
+
+        return Summoner(name, icon_id, level, tier, division, mmr_ranked, mmr_normal, mmr_aram, LP)
     except ApiError as err:
         print("Encountered an error fetching user data.")
 
@@ -185,10 +229,10 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
 def main():
     api_key = utils.read_key()
     print(api_key)
-    create_summoner('Doublelift', 'na1', api_key)
-    create_summoner('bean217', 'na1', api_key)
-    create_summoner('Willie', 'na1', api_key)
-    create_summoner('Jason Woodrue', 'na1', api_key)
+    print(create_summoner('Doublelift', 'na1', api_key))
+    print(create_summoner('bean217', 'na1', api_key))
+    print(create_summoner('Willie', 'na1', api_key))
+    print(create_summoner('Jason Woodrue', 'na1', api_key))
 
 if __name__ == "__main__":
     main()
