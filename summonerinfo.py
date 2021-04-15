@@ -74,6 +74,15 @@ class Division(Enum):
     II = 3
     I = 4
 
+# Enum of possible role options
+class Role(Enum):
+    FILL = 0
+    TOP = 1
+    JUNGLE = 2
+    MID = 3
+    ADC = 4
+    SUPPORT = 5
+
 # Encapsulates Summoner data and provides getters for fetching summoner info
 class Summoner:
     __slots__ = ["__name", "__icon_id", "__level","__tier", "__division", "__MMR_ranked", "__MMR_normal", "__MMR_ARAM", "__LP"]
@@ -117,6 +126,33 @@ class Summoner:
 
     def getMMR_ARAM(self) -> int:
         return self.__MMR_ARAM
+
+class Player:
+    __slots__ = ["__name", "__role_primary", "__role_secondary", "__summoner_data"]
+
+    def __init__(self, name: str, primary_role: Role, secondary_role: Role, summoner_data: Summoner):
+        self.__name = name
+        self.__role_primary = primary_role
+        self.__role_secondary = secondary_role
+        self.__summoner_data = summoner_data
+
+    def __str__(self):
+        return f'Player Name: {self.__name}\n\t' + \
+            f'Summoner Name: {self.__summoner_data.getName()}\n\t' + \
+            f'Primary Role: {self.__role_primary.name}\n\t' + \
+            f'Secondary Role: {self.__role_secondary.name}'
+
+    def getName(self) -> str:
+        return self.__name
+
+    def getPrimaryRole(self) -> Role:
+        return self.__role_primary
+
+    def getSecondaryRole(self) -> Role:
+        return self.__role_secondary
+
+    def getSummonerData(self) -> Summoner:
+        return self.__summoner_data
 
 # Converting the String data into Enum
 def get_rank_tuple(tier: str, division: str) -> (Tier, Division):
