@@ -127,7 +127,6 @@ class Summoner:
             return -1
         max = -1
         for arg in gamemode_list:
-            print(arg)
             new_max = self.getGameModeMMR(arg)
             if new_max > max:
                 max = new_max
@@ -155,9 +154,9 @@ class Summoner:
     # return 1 if self > other
     # return 0 if self = other
     # return -1 if self < other
-    def cmp_mmr(self, other, *gamemode_args):
-        self_mmr = self.getMaxMMR([arg for arg in gamemode_args])
-        other_mmr = other.getMaxMMR([arg for arg in gamemode_args])
+    def cmp_mmr(self, other, gamemode_list: list):
+        self_mmr = self.getMaxMMR(gamemode_list)
+        other_mmr = other.getMaxMMR(gamemode_list)
         print(self_mmr)
         print(other_mmr)
         if self_mmr > other_mmr:
@@ -194,6 +193,17 @@ class Player:
 
     def getSummonerData(self) -> Summoner:
         return self.__summoner_data
+
+    # return 1 if self > other
+    # return 0 if self = other
+    # return -1 if self < other
+    def cmp_mmr(self, other, gamemode_list: list):
+        return self.__summoner_data.cmp_mmr(other, gamemode_list)
+
+# sorts players by their max mmr depending on a list of gamemode enums
+def sort_players_by_mmr(players: list, gamemode_list: list, descending: bool=True) -> list:
+    players.sort(key=lambda player: player.getSummonerData().getMaxMMR(gamemode_list), reverse=descending)
+    return players
 
 """
 Takes a list of players and an algorithm for diving players into teams to make teams
@@ -313,9 +323,13 @@ def main():
     api_key = utils.read_key()
     print(api_key)
     s1 = create_summoner('Doublelift', 'na1', api_key)
+    p1 = Player("Doublelift", Role.TOP, Role.MID, s1)
     s2 = create_summoner('bean217', 'na1', api_key)
+    p2 = Player("bean217", Role.TOP, Role.MID, s2)
     s3 = create_summoner('Willie', 'na1', api_key)
+    p3 = Player("Willie", Role.TOP, Role.MID, s3)
     s4 = create_summoner('Jason Woodrue', 'na1', api_key)
+    p4 = Player("Jason Woodrue", Role.TOP, Role.MID, s4)
     print(s1)
     print(s1.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
     print(s2)
@@ -324,7 +338,11 @@ def main():
     print(s3.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
     print(s4)
     print(s4.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
-    print(s2.cmp_mmr(s4, GameMode.NORMAL, GameMode.RANKED))
+    print(s2.cmp_mmr(s4, [GameMode.NORMAL, GameMode.RANKED]))
+    print("SORTING BY MMR")
+    sorted_players = sort_players_by_mmr([p1, p2, p3, p4], [GameMode.NORMAL, GameMode.RANKED])
+    for p in sorted_players:
+        print(p)
 
 if __name__ == "__main__":
     main()
