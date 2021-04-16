@@ -83,6 +83,11 @@ class Role(Enum):
     ADC = 4
     SUPPORT = 5
 
+class GameMode(Enum):
+    RANKED = 0
+    NORMAL = 1
+    ARAM = 2
+
 # Encapsulates Summoner data and provides getters for fetching summoner info
 class Summoner:
     __slots__ = ["__name", "__icon_id", "__level","__tier", "__division", "__MMR_ranked", "__MMR_normal", "__MMR_ARAM", "__LP"]
@@ -102,12 +107,32 @@ class Summoner:
         return f'Summoner: {self.__name}\n\t' + \
             f'icon_id: {self.__icon_id}\n\t' + \
             f'level: {self.__level}\n\t' + \
-            f'tier: {self.__tier}\n\t' + \
-            f'division: {self.__division}\n\t' + \
+            f'tier: {self.__tier.name}\n\t' + \
+            f'division: {self.__division.name}\n\t' + \
             f'mmr_ranked: {self.__MMR_ranked}\n\t' + \
             f'mmr_normal: {self.__MMR_normal}\n\t' + \
             f'mmr_ARAM: {self.__MMR_ARAM}\n\t' + \
             f'LP: {self.__LP}'
+
+    def getGameModeMMR(self, gamemode: GameMode) -> int:
+        if gamemode == GameMode.RANKED:
+            return self.__MMR_ranked
+        elif gamemode == GameMode.NORMAL:
+            return self.__MMR_normal
+        else:
+            return self.__MMR_ARAM
+
+    def getMaxMMR(self, gamemode_list: list):
+        if len(gamemode_list) < 1 or len(gamemode_list) > 3:
+            return -1
+        max = -1
+        for arg in gamemode_list:
+            print(arg)
+            new_max = self.getGameModeMMR(arg)
+            if new_max > max:
+                max = new_max
+        return max
+
 
     def getName(self) -> str:
         return self.__name
@@ -126,6 +151,22 @@ class Summoner:
 
     def getMMR_ARAM(self) -> int:
         return self.__MMR_ARAM
+
+    # return 1 if self > other
+    # return 0 if self = other
+    # return -1 if self < other
+    def cmp_mmr(self, other, *gamemode_args):
+        self_mmr = self.getMaxMMR([arg for arg in gamemode_args])
+        other_mmr = other.getMaxMMR([arg for arg in gamemode_args])
+        print(self_mmr)
+        print(other_mmr)
+        if self_mmr > other_mmr:
+            return 1
+        elif self_mmr < other_mmr:
+            return -1
+        else:
+            return 0
+
 
 class Player:
     __slots__ = ["__name", "__role_primary", "__role_secondary", "__summoner_data"]
@@ -153,6 +194,12 @@ class Player:
 
     def getSummonerData(self) -> Summoner:
         return self.__summoner_data
+
+"""
+Takes a list of players and an algorithm for diving players into teams to make teams
+"""
+def setupMakeTeams(players: list, algorithm):
+    return algorithm(players)
 
 # Converting the String data into Enum
 def get_rank_tuple(tier: str, division: str) -> (Tier, Division):
@@ -265,10 +312,19 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
 def main():
     api_key = utils.read_key()
     print(api_key)
-    print(create_summoner('Doublelift', 'na1', api_key))
-    print(create_summoner('bean217', 'na1', api_key))
-    print(create_summoner('Willie', 'na1', api_key))
-    print(create_summoner('Jason Woodrue', 'na1', api_key))
+    s1 = create_summoner('Doublelift', 'na1', api_key)
+    s2 = create_summoner('bean217', 'na1', api_key)
+    s3 = create_summoner('Willie', 'na1', api_key)
+    s4 = create_summoner('Jason Woodrue', 'na1', api_key)
+    print(s1)
+    print(s1.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
+    print(s2)
+    print(s2.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
+    print(s3)
+    print(s3.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
+    print(s4)
+    print(s4.getMaxMMR([GameMode.NORMAL, GameMode.RANKED]))
+    print(s2.cmp_mmr(s4, GameMode.NORMAL, GameMode.RANKED))
 
 if __name__ == "__main__":
     main()
