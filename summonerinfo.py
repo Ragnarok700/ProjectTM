@@ -16,6 +16,8 @@ License: Creative Commons Attribution 2.0 Generic (CC BY 2.0)
 from riotwatcher import LolWatcher, ApiError
 from enum import Enum
 from typing import Union
+
+import PTM_lib
 import utils
 import requests
 
@@ -82,6 +84,22 @@ class Role(Enum):
     MID = 3
     ADC = 4
     SUPPORT = 5
+
+def str_to_role(role_str: str):
+    if (role_str == 'FILL'):
+        return Role.FILL
+    elif (role_str == 'TOP'):
+        return Role.TOP
+    elif (role_str == 'JUNGLE'):
+        return Role.JUNGLE
+    elif (role_str == 'MID'):
+        return Role.MID
+    elif (role_str == 'ADC'):
+        return Role.ADC
+    elif (role_str == 'SUPPORT'):
+        return Role.SUPPORT
+    else:
+        raise Exception(f"role_str 'Role.{role_str}' is not a valid role")
 
 class GameMode(Enum):
     RANKED = 0
@@ -168,16 +186,17 @@ class Summoner:
 
 
 class Player:
-    __slots__ = ["__name", "__role_primary", "__role_secondary", "__summoner_data"]
+    __slots__ = ["__name", "__role_primary", "__role_secondary", "__assigned_role", "__summoner_data"]
 
     def __init__(self, name: str, primary_role: Role, secondary_role: Role, summoner_data: Summoner):
         self.__name = name
         self.__role_primary = primary_role
         self.__role_secondary = secondary_role
+        self.__assigned_role = primary_role
         self.__summoner_data = summoner_data
 
     def __str__(self):
-        return f'Player Name: {self.__name}\n\t' + \
+        return f'Player Name: {self.__name} -- {self.__assigned_role.name}\n\t' + \
             f'Summoner Name: {self.__summoner_data.getName()}\n\t' + \
             f'Primary Role: {self.__role_primary.name}\n\t' + \
             f'Secondary Role: {self.__role_secondary.name}'
@@ -193,6 +212,12 @@ class Player:
 
     def getSummonerData(self) -> Summoner:
         return self.__summoner_data
+
+    def getAssignedRole(self) -> Role:
+        return self.__assigned_role
+
+    def setAssignedRole(self, role: Role):
+        self.__assigned_role = role
 
     # return 1 if self > other
     # return 0 if self = other
@@ -319,9 +344,44 @@ def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, Non
 
     return None
 
+def test(api_key):
+    players = []
+    # s1 = create_summoner('Doublelift', 'na1', api_key)
+    # players += [Player("Doublelift", Role.TOP, Role.MID, s1)]
+    s1 = create_summoner('Pasteur4992', 'na1', api_key)
+    players += [Player("Pasteur4992", Role.TOP, Role.SUPPORT, s1)]
+    s2 = create_summoner('bean217', 'na1', api_key)
+    players += [Player("bean217", Role.JUNGLE, Role.TOP, s2)]
+    s3 = create_summoner('Willie', 'na1', api_key)
+    players += [Player("Willie", Role.MID, Role.TOP, s3)]
+    s4 = create_summoner('Jason Woodrue', 'na1', api_key)
+    players += [Player("Jason Woodrue", Role.JUNGLE, Role.MID, s4)]
+    s5 = create_summoner('DaaoX', 'na1', api_key)
+    players += [Player("DaaoX", Role.TOP, Role.JUNGLE, s5)]
+    s6 = create_summoner('jujubears', 'na1', api_key)
+    players += [Player('jujubears', Role.ADC, Role.SUPPORT, s6)]
+    s7 = create_summoner('Taito', 'na1', api_key)
+    players += [Player('Taito', Role.ADC, Role.TOP, s7)]
+    s8 = create_summoner('barrakada', 'na1', api_key)
+    players += [Player('barrakada', Role.SUPPORT, Role.ADC, s8)]
+    s9 = create_summoner('FrostedWolf1', 'na1', api_key)
+    players += [Player('FrostedWolf1', Role.JUNGLE, Role.MID, s9)]
+    s10 = create_summoner('Yen LoL', 'na1', api_key)
+    players += [Player('Yen LoL', Role.MID, Role.JUNGLE, s10)]
+    teams = PTM_lib.tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
+    i = 1
+    for team in teams.values():
+        print(f"\n\n### TEAM {i} ###")
+        i += 1
+        for player in team:
+            print(player)
+
 def main():
     api_key = utils.read_key()
     print(api_key)
+    print("##### TESTING #####")
+    test(api_key)
+    '''
     s1 = create_summoner('Doublelift', 'na1', api_key)
     p1 = Player("Doublelift", Role.TOP, Role.MID, s1)
     s2 = create_summoner('bean217', 'na1', api_key)
@@ -343,6 +403,8 @@ def main():
     sorted_players = sort_players_by_mmr([p1, p2, p3, p4], [GameMode.NORMAL, GameMode.RANKED])
     for p in sorted_players:
         print(p)
+    '''
+
 
 if __name__ == "__main__":
     main()

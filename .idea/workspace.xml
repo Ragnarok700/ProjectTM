@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b5fe302-cc6b-4109-a136-eee08d583746" name="Default Changelist" comment="Added methods in the Summoner class for comparing summoners by selected max MMR (matchmaking rating) values">
+      <change beforePath="$PROJECT_DIR$/.idea/ProjectTM.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ProjectTM.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PTM_lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/PTM_lib.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/summonerinfo.py" beforeDir="false" afterPath="$PROJECT_DIR$/summonerinfo.py" afterDir="false" />
@@ -41,7 +43,8 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
