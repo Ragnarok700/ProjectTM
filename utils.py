@@ -1,6 +1,6 @@
 from os import path
 
-API_KEY_FILENAME: str = "api_key.ignore"
+API_KEY_FILENAME: str = "api_key.key"
 
 def read_key() -> str:
     # if key not defined, or file does not exist
