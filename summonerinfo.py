@@ -17,7 +17,7 @@ from riotwatcher import LolWatcher, ApiError
 from enum import Enum
 from typing import Union
 
-import PTM_lib
+import tournament_5v5
 import utils
 import requests
 
@@ -186,10 +186,11 @@ class Summoner:
 
 
 class Player:
-    __slots__ = ["__name", "__role_primary", "__role_secondary", "__assigned_role", "__summoner_data"]
+    __slots__ = ["__name", "__discord_name", "__role_primary", "__role_secondary", "__assigned_role", "__summoner_data"]
 
-    def __init__(self, name: str, primary_role: Role, secondary_role: Role, summoner_data: Summoner):
+    def __init__(self, name: str, primary_role: Role, secondary_role: Role, summoner_data: Summoner, discord: str=""):
         self.__name = name
+        self.__discord_name = discord
         self.__role_primary = primary_role
         self.__role_secondary = secondary_role
         self.__assigned_role = primary_role
@@ -368,7 +369,7 @@ def test(api_key):
     players += [Player('FrostedWolf1', Role.JUNGLE, Role.MID, s9)]
     s10 = create_summoner('Yen LoL', 'na1', api_key)
     players += [Player('Yen LoL', Role.MID, Role.JUNGLE, s10)]
-    teams = PTM_lib.tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
+    teams = tournament_5v5.tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
     i = 1
     for team in teams.values():
         print(f"\n\n### TEAM {i} ###")

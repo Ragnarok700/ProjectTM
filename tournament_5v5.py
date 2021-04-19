@@ -1,6 +1,5 @@
 from summonerinfo import *
 
-
 class InvalidPlayerListException(Exception):
     __slots__ = ["__message"]
 
