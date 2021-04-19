@@ -17,7 +17,6 @@ from riotwatcher import LolWatcher, ApiError
 from enum import Enum
 from typing import Union
 
-import tournament_5v5
 import utils
 import requests
 
@@ -369,6 +368,7 @@ def test(api_key):
     players += [Player('FrostedWolf1', Role.JUNGLE, Role.MID, s9)]
     s10 = create_summoner('Yen LoL', 'na1', api_key)
     players += [Player('Yen LoL', Role.MID, Role.JUNGLE, s10)]
+    '''
     teams = tournament_5v5.tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
     i = 1
     for team in teams.values():
@@ -376,6 +376,7 @@ def test(api_key):
         i += 1
         for player in team:
             print(player)
+    '''
 
 def main():
     api_key = utils.read_key()

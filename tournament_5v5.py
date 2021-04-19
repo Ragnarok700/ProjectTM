@@ -11,6 +11,8 @@ class InvalidPlayerListException(Exception):
 
 
 def tournament_5v5_team_contains_role(team: list, role: Role):
+    if role == Role.FILL:
+        return True
     for player in team:
         if player.getAssignedRole() == role:
             return True
@@ -64,7 +66,7 @@ Greedy team balancing algorithm for creating 2 or more teams of 5 players
 @pre: Total number of players must be a multiple of 5
 @return dict<str, list<Player>>, or None if not a multiple of 5
 """
-def tournament_5v5(players: list, gamemode_list: list):
+def create_tournament_5v5(players: list, gamemode_list: list):
     # check if list of players is valid
     size: int = len(players)
     if (size < 10 or size % 5 != 0):
@@ -78,10 +80,10 @@ def tournament_5v5(players: list, gamemode_list: list):
     teams = {}
     teams_fills = {}
     for i in range(1, num_teams+1):
-        teams[f'Team{i}'] = [players.pop(0)]
+        teams[f'Team{i}'] = []
         teams_fills[f'Team{i}'] = []
     # zig-zag back and forth adding the next highest player TODO: fix this for tomorrow
-    for i in range(4):
+    for i in range(5):
         if (i % 2 == 0):
             # add backwards
             for j in range(num_teams, 0, -1):

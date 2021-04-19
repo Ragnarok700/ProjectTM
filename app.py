@@ -38,10 +38,11 @@ def upload_file():
     players = read_player_data(stream)
 
     print("\n##### CREATING TEAMS #####\n")
-    teams = tournament_5v5.tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
+    teams = create_tournament_5v5(players, [GameMode.NORMAL, GameMode.RANKED])
     i = 1
-    for team in teams:
-        print(f"### TEAM #{i} ###")
+    for team in teams.values():
+        print(f"\n### TEAM #{i} ###\n")
+        i += 1
         for player in team:
             print(player)
 
