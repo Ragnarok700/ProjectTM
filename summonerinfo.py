@@ -148,6 +148,9 @@ class Summoner:
     def getName(self) -> str:
         return self.__name
 
+    def getIcon(self) -> int:
+        return self.__icon_id
+
     def getLevel(self) -> int:
         return self.__level
 
@@ -180,7 +183,6 @@ class Summoner:
 """
 Encapsulates the tournament participants registration data
 """
-
 class Player:
     __slots__ = ["__name", "__discord_name", "__role_primary", "__role_secondary", "__assigned_role", "__summoner_data"]
 
@@ -197,6 +199,7 @@ class Player:
     def __str__(self):
         return f'Player Name: {self.__name} -- {self.__assigned_role.name}\n\t' + \
             f'Summoner Name: {self.__summoner_data.getName()}\n\t' + \
+            f'Icon ID: {self.__summoner_data.getIcon()}\n\t' + \
             f'Primary Role: {self.__role_primary.name}\n\t' + \
             f'Secondary Role: {self.__role_secondary.name}'
 

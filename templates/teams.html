@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    </head>
+    <body>
+        <div class="header">
+            <h2>Tournament Teams</h2>
+        </div>
+        <div class="teams">
+            {% for team in g.teams.keys() %}
+            <div class="team">
+                <h2>{{ team }}</h2>
+                {% for player in g.teams[team] %}
+                <div class="player">
+                    <img class="player-img" src="http://ddragon.leagueoflegends.com/cdn/11.8.1/img/profileicon/{{ player.getSummoner().getIcon() }}.png">
+                    <div class="player-info">
+                        <p>
+                            <b>{{ player.getName() }}</b><br/>
+                            {{ player.getDiscord() }}<br/>
+                            {{ player.getSummoner().getName() }}<br/>
+                            {{ player.getAssignedRole().name }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

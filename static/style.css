@@ -1,0 +1,42 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+.header {
+    display: flex;
+}
+
+.teams {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.player {
+    display: flex;
+    background-color: dimgray;
+    border-radius: 5%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.player-img {
+    display: inline-block;
+    height: 5em;
+    width: 5em;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+p {
+    margin: 0;
+}

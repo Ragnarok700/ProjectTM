@@ -5,7 +5,7 @@ Load webpages and handle routes
 """
 
 import io
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, g
 from controller import *
 from tournament_5v5 import *
 from summonerinfo import *
@@ -54,15 +54,8 @@ def upload_file():
             print(player)
     #####
 
-    # Builds a string to represent a web page for displaying the teams
-    i = 1
-    bad_implementation = ""
-    for team in teams.values():
-        bad_implementation += f"<br/><br/>### TEAM #{i} ###<br/><br>"
-        i += 1
-        for player in team:
-            bad_implementation += f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{player.getName()} --- "{player.getDiscord()}" --- "{player.getSummoner().getName()}" --- {player.getAssignedRole().name}<br/>'
-    return bad_implementation
+    g.teams = teams
+    return render_template('teams.html')
 
 if __name__ == "__main__":
     app.run()
