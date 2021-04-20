@@ -60,7 +60,6 @@ def tournament_5v5_fix_collisions(team: list, team_fills: list):
             player.setAssignedRole(str_to_role(role))
             team += [player]
 
-
 """
 Greedy team balancing algorithm for creating 2 or more teams of 5 players
 @pre: Total number of players must be a multiple of 5

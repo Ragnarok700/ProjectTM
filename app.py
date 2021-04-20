@@ -46,7 +46,15 @@ def upload_file():
         for player in team:
             print(player)
 
-    return redirect(url_for("home"))
+    i = 1
+    shitty_implementation = ""
+    for team in teams.values():
+        shitty_implementation += f"<br/><br/>### TEAM #{i} ###<br/><br>"
+        i += 1
+        for player in team:
+            shitty_implementation += f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{player.getName()} --- "{player.getSummoner().getName()}" --- {player.getAssignedRole().name}<br/>'
+
+    return shitty_implementation
     #return redirect(url_for("user", name="Admin!"))
 
 if __name__ == "__main__":

@@ -2,13 +2,29 @@
 <html>
   <head>
     <title>ProjectTM</title>
+    <!--
+    <script>
+      var hidden = false;
+      function action() {
+        hidden = !hidden;
+        if(hidden) {
+          document.getElementById('generate').style.display = 'block';
+          this.style.display = 'none'
+          document.getElementById('loading').style.visibility = 'visible';
+        } else {
+          document.getElementById('generate').style.visibility = 'visible';
+        }
+      }
+    </script>
+    -->
   </head>
   <body>
     <center>
       <h1>Upload Players for League of Legends 5v5 Tournament</h1>
       <form method="POST" action="" enctype="multipart/form-data">
         <p><input type="file" name="file" accept=".csv"></p>
-        <p><input type="submit" value="Generate Teams"></p>
+        <p><input type="submit" value="Generate Teams" id="generate" onClick="this.style.visibility= 'hidden'; alert('Generating teams, please wait.');"></p>
+        <p id="loading" style="visibility:hidden;">Generating teams, please wait.</p>
       </form>
     </center>
   </body>

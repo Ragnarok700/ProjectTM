@@ -195,6 +195,9 @@ class Player:
         self.__assigned_role = primary_role
         self.__summoner_data = summoner_data
 
+    def getSummoner(self):
+        return self.__summoner_data
+
     def __str__(self):
         return f'Player Name: {self.__name} -- {self.__assigned_role.name}\n\t' + \
             f'Summoner Name: {self.__summoner_data.getName()}\n\t' + \

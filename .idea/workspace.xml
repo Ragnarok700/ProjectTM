@@ -7,7 +7,7 @@
     <list default="true" id="4b5fe302-cc6b-4109-a136-eee08d583746" name="Default Changelist" comment="Began work on front end of the application">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/summonerinfo.py" beforeDir="false" afterPath="$PROJECT_DIR$/summonerinfo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tournament_5v5.py" beforeDir="false" afterPath="$PROJECT_DIR$/tournament_5v5.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
