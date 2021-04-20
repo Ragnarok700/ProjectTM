@@ -1,4 +1,8 @@
-'''
+"""
+ProjectTM
+summonerinfo.py
+Serves as the Model for the Application by making API calls to get player data
+
 Attributions:
 
 Title: Riot Games API
@@ -10,7 +14,7 @@ Title: What Is My MMR?
 Author: Josh (https://www.patreon.com/whatismymmr)
 Source: https://dev.whatismymmr.com/
 License: Creative Commons Attribution 2.0 Generic (CC BY 2.0)
-'''
+"""
 
 # Imports
 from riotwatcher import LolWatcher, ApiError
@@ -20,23 +24,7 @@ from typing import Union
 import utils
 import requests
 
-# Global Variables
-
-#try:
-#    watcher = LolWatcher(api_key)
-#
-#    my_region = 'na1'
-#
-#    me = watcher.summoner.by_name(my_region, 'Doublelift')
-#    print(me)
-#
-#    # all objects are returned (by default) as a dict
-#    my_ranked_stats = watcher.league.by_summoner(my_region, me['id'])
-#    print(my_ranked_stats)
-#except:
-#    print("RIOT API KEY NOT VALID")
-
-##### CONSTANTS #####
+##### GLOBAL CONSTANTS #####
 
 # Summoner LolWatcher API keys
 LP_KEY = "leaguePoints"
@@ -84,6 +72,7 @@ class Role(Enum):
     ADC = 4
     SUPPORT = 5
 
+# Convert a string to a role enum if the string represents a role
 def str_to_role(role_str: str):
     if (role_str == 'FILL'):
         return Role.FILL
@@ -100,6 +89,7 @@ def str_to_role(role_str: str):
     else:
         raise Exception(f"role_str 'Role.{role_str}' is not a valid role")
 
+# Enum of possible matchmaking rating (MMR) types
 class GameMode(Enum):
     RANKED = 0
     NORMAL = 1
@@ -109,6 +99,7 @@ class GameMode(Enum):
 class Summoner:
     __slots__ = ["__name", "__icon_id", "__level","__tier", "__division", "__MMR_ranked", "__MMR_normal", "__MMR_ARAM", "__LP"]
 
+    # Constructor for the Summoner Class
     def __init__(self, __name: str, __icon_id: int, __level: int, __tier: Tier, __division: Division,__MMR_ranked: int, __MMR_normal: int, __MMR_ARAM: int, __LP: int):
         self.__name = __name
         self.__icon_id = __icon_id
@@ -120,6 +111,7 @@ class Summoner:
         self.__MMR_ARAM = __MMR_ARAM
         self.__LP = __LP
 
+    # toString of the Summoner Class
     def __str__(self):
         return f'Summoner: {self.__name}\n\t' + \
             f'icon_id: {self.__icon_id}\n\t' + \
@@ -131,6 +123,7 @@ class Summoner:
             f'mmr_ARAM: {self.__MMR_ARAM}\n\t' + \
             f'LP: {self.__LP}'
 
+    # Get a Summoner's MMR based on the Gamemode enum
     def getGameModeMMR(self, gamemode: GameMode) -> int:
         if gamemode == GameMode.RANKED:
             return self.__MMR_ranked
@@ -139,6 +132,7 @@ class Summoner:
         else:
             return self.__MMR_ARAM
 
+    # Get's the Summoner's highest MMR based on a list of Gamemode enums
     def getMaxMMR(self, gamemode_list: list):
         if len(gamemode_list) < 1 or len(gamemode_list) > 3:
             return -1
@@ -149,6 +143,7 @@ class Summoner:
                 max = new_max
         return max
 
+    ### Public Accessors ###
 
     def getName(self) -> str:
         return self.__name
@@ -168,14 +163,13 @@ class Summoner:
     def getMMR_ARAM(self) -> int:
         return self.__MMR_ARAM
 
+    # Comparison function for Summoner MMR
     # return 1 if self > other
     # return 0 if self = other
     # return -1 if self < other
     def cmp_mmr(self, other, gamemode_list: list):
         self_mmr = self.getMaxMMR(gamemode_list)
         other_mmr = other.getMaxMMR(gamemode_list)
-        print(self_mmr)
-        print(other_mmr)
         if self_mmr > other_mmr:
             return 1
         elif self_mmr < other_mmr:
@@ -183,10 +177,14 @@ class Summoner:
         else:
             return 0
 
+"""
+Encapsulates the tournament participants registration data
+"""
 
 class Player:
     __slots__ = ["__name", "__discord_name", "__role_primary", "__role_secondary", "__assigned_role", "__summoner_data"]
 
+    # Constructor for the Player class
     def __init__(self, name: str, primary_role: Role, secondary_role: Role, summoner_data: Summoner, discord: str=""):
         self.__name = name
         self.__discord_name = discord
@@ -195,14 +193,17 @@ class Player:
         self.__assigned_role = primary_role
         self.__summoner_data = summoner_data
 
-    def getSummoner(self):
-        return self.__summoner_data
-
+    # toString of the Player Class
     def __str__(self):
         return f'Player Name: {self.__name} -- {self.__assigned_role.name}\n\t' + \
             f'Summoner Name: {self.__summoner_data.getName()}\n\t' + \
             f'Primary Role: {self.__role_primary.name}\n\t' + \
             f'Secondary Role: {self.__role_secondary.name}'
+
+    ### Public Accessors ###
+
+    def getSummoner(self):
+        return self.__summoner_data
 
     def getName(self) -> str:
         return self.__name
@@ -222,20 +223,23 @@ class Player:
     def setAssignedRole(self, role: Role):
         self.__assigned_role = role
 
+    def getDiscord(self) -> str:
+        return self.__discord_name
+
+    # Comparison function for Player that calls the comparison function of their Summoner (account)
     # return 1 if self > other
     # return 0 if self = other
     # return -1 if self < other
     def cmp_mmr(self, other, gamemode_list: list):
         return self.__summoner_data.cmp_mmr(other, gamemode_list)
 
-# sorts players by their max mmr depending on a list of gamemode enums
+# Sorts players by their max MMR depending on a list of Gamemode enums
 def sort_players_by_mmr(players: list, gamemode_list: list, descending: bool=True) -> list:
     players.sort(key=lambda player: player.getSummonerData().getMaxMMR(gamemode_list), reverse=descending)
     return players
 
-"""
-Takes a list of players and an algorithm for diving players into teams to make teams
-"""
+# PROSPECTIVE ****
+# Takes a list of players and a specific algorithm for diving players into teams to make teams
 def setupMakeTeams(players: list, algorithm):
     return algorithm(players)
 
@@ -243,6 +247,7 @@ def setupMakeTeams(players: list, algorithm):
 def get_rank_tuple(tier: str, division: str) -> (Tier, Division):
     enum_tier = Tier.IRON   # Start with Iron because Unranked is not applicable
     enum_div = Division.I   # Start with division I because there is no null division (value of 0)
+
     # Get Tier
     if (tier == Tier.BRONZE.name):
         enum_tier = Tier.BRONZE
@@ -271,82 +276,105 @@ def get_rank_tuple(tier: str, division: str) -> (Tier, Division):
 
     return (enum_tier, enum_div)
 
-"""
+'''
+Rank Comparison Function
 Compares two ranks first by tier, then by division
 @return < 0 if rank1 < rank2, > 0 if rank1 > rank2, 0 if rank1 == rank2
-"""
+'''
 def compare_rank(rank1: (Tier, Division), rank2: (Tier, Division)):
+    # First, compare the tiers
     if (rank1[0].value < rank2[0].value):
         return -1
     elif (rank1[0].value > rank2[0].value):
         return 1
+
+    # Next, compare the divisions
     else:
         if (rank1[1].value < rank2[1].value):
             return -1
         elif (rank1[1].value > rank2[1].value):
             return 1
+        # Both players' tiers and divisions are equal
         else:
             return 0
 
-"""
+'''
+Get Highest Rank Function
 Gets the highest rank from list of a player's rank dictionaries
+When pulling player data from Riot Games API, each player has multiple ranks.
+This function gets the highest of those ranks.
 @return the largest rank dictionary, or empty dictionary if list is empty
-"""
+'''
 def get_highest_rank(rank_data: list) -> dict:
     if len(rank_data) == 0:
-        return {}
+        return {}               # Player is Unranked
     elif len(rank_data) == 1:
-        return rank_data[0]
-    else:
+        return rank_data[0]     # Player has only one rank
+    else:                       # Player has more than one rank, find highest rank
+        # Initialize temp highest rank
         max_rank_data = rank_data[0]
+
+        # Iterate through ranked data to compare with current max rank
         for rank in rank_data[1:]:
             if compare_rank(get_rank_tuple(rank[TIER_KEY], rank[DIVISION_KEY]), get_rank_tuple(max_rank_data[TIER_KEY], max_rank_data[DIVISION_KEY])) > 0:
                 max_rank_data = rank
         return max_rank_data
 
-"""
-Creates a summoner by fetching summoner data from Riot API using RiotWatcher library
+'''
+Create Summoner Function
+Creates a summoner by fetching summoner data from Riot Games API using RiotWatcher library
 @return Summoner instance or None if summoner cannot be fetched by API
-"""
+'''
 def create_summoner(name: str, region: str, api_key: str) -> Union[Summoner, None]:
+    # Initialize RiotWatcher and region input
     watcher = LolWatcher(api_key)
     my_region = region
 
+    # Make API calls to fetch summoner data, soft fail if summoner data cannot be fetched
     try:
-        summoner_by_name = watcher.summoner.by_name(my_region, name)
-        level = int(summoner_by_name[LEVEL_KEY])
-        icon_id = int(summoner_by_name[ICON_ID_KEY])
-        summoner_ranked_data = watcher.league.by_summoner(my_region, summoner_by_name['id'])
-        # get MMR data:
-        request = requests.get(f'https://na.whatismymmr.com/api/v1/summoner?name={name}')
+        summoner_by_name = watcher.summoner.by_name(my_region, name)    # Summoner Name
+        level = int(summoner_by_name[LEVEL_KEY])                        # Summoner Level
+        icon_id = int(summoner_by_name[ICON_ID_KEY])                    # Summoner Icon ID
+        summoner_ranked_data = watcher.league.by_summoner(my_region, summoner_by_name['id'])    # Summoner Ranked Data
+
+        # Make API call to fetch summoner matchamking rating (MMR) data
+        request = requests.get(f'https://na.whatismymmr.com/api/v1/summoner?name={name}')   # API Call
         MMR_dict = request.json()
         mmr_ranked = MMR_dict[MMR_RANKED_KEY][MMR_AVG_KEY]
         mmr_normal = MMR_dict[MMR_NORMAL_KEY][MMR_AVG_KEY]
         mmr_aram = MMR_dict[MMR_ARAM_KEY][MMR_AVG_KEY]
 
+        # If Ranked 5v5 MMR does not exist, set to -1
         if (mmr_ranked == None):
             mmr_ranked = -1
 
+        # If Normal 5v5 MMR does not exist, set to -1
         if (mmr_normal == None):
             mmr_normal = -1
 
+        # If ARAM MMR does not exist, set to -1
         if (mmr_aram == None):
             mmr_aram = -1
 
+        # Return Unranked Summoner object if the summoner is Unranked
         if (len(summoner_ranked_data) == 0):
             return Summoner(name, icon_id, level, Tier.UNRANKED, Division.UNRANKED, mmr_ranked, mmr_normal, mmr_aram, 0)
 
+        # Otherwise, create and return the Ranked Summoner Object
         highest_rank_data = get_highest_rank(summoner_ranked_data)
 
         tier, division = get_rank_tuple(highest_rank_data[TIER_KEY], highest_rank_data[DIVISION_KEY])
         LP = int(highest_rank_data[LP_KEY])
 
         return Summoner(name, icon_id, level, tier, division, mmr_ranked, mmr_normal, mmr_aram, LP)
+
+    # Soft fail case for summoner name that does not exist
     except ApiError as err:
         print("Encountered an error fetching user data.")
 
     return None
 
+# FOR TESTING PURPOSES ONLY
 def test(api_key):
     players = []
     # s1 = create_summoner('Doublelift', 'na1', api_key)
@@ -381,6 +409,7 @@ def test(api_key):
             print(player)
     '''
 
+# FOR TESTING PURPOSES ONLY
 def main():
     api_key = utils.read_key()
     print(api_key)
